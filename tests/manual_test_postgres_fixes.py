@@ -5,7 +5,6 @@
 import asyncio
 import sys
 from pathlib import Path
-from datetime import datetime
 
 # Добавляем корневую директорию в путь
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -136,13 +135,13 @@ async def test_3_advisory_lock_keys():
         
         # Проверяем что ключи в диапазоне int32
         if not (-2**31 <= high_key < 2**31 and -2**31 <= low_key < 2**31):
-            print(f"    ❌ Ключи вне диапазона int32!")
+            print("    ❌ Ключи вне диапазона int32!")
             return False
         
         # Проверяем уникальность пары
         key_pair = (high_key, low_key)
         if key_pair in all_keys:
-            print(f"    ❌ Коллизия ключей!")
+            print("    ❌ Коллизия ключей!")
             return False
         all_keys.add(key_pair)
     
