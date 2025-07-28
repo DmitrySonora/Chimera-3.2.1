@@ -1,17 +1,10 @@
-from typing import Optional, Dict, Any
+from typing import Optional
 import asyncio
-from datetime import datetime
 
 from actors.base_actor import BaseActor
 from actors.messages import ActorMessage, MESSAGE_TYPES
-from actors.events import BaseEvent
-from config.logging import get_logger
 from config.settings import (
-    STM_BUFFER_SIZE,
-    STM_CLEANUP_BATCH_SIZE,
     STM_QUERY_TIMEOUT,
-    STM_CONTEXT_FORMAT,
-    STM_INCLUDE_METADATA,
     STM_METRICS_ENABLED,
     STM_METRICS_LOG_INTERVAL
 )
@@ -71,6 +64,7 @@ class MemoryActor(BaseActor):
             self.logger.error(f"Failed to initialize MemoryActor: {str(e)}")
             self._degraded_mode = True
             self._metrics['degraded_mode_entries'] += 1
+            self._increment_metric('db_errors')
             self.logger.warning("MemoryActor entering degraded mode - will work without persistence")
     
     async def shutdown(self) -> None:
@@ -118,6 +112,9 @@ class MemoryActor(BaseActor):
     async def _verify_schema(self) -> None:
         """Проверка существования таблицы и индексов"""
         try:
+            if self._pool is None:
+                raise RuntimeError("Database pool not initialized")
+                
             # Проверяем существование таблицы
             query = """
                 SELECT EXISTS (
@@ -165,7 +162,7 @@ class MemoryActor(BaseActor):
             return
         
         # TODO: Реализация в этапе 3.2.2
-        self.logger.debug(f"STORE_MEMORY handler called (stub)")
+        self.logger.debug("STORE_MEMORY handler called (stub)")
     
     async def _handle_get_context(self, message: ActorMessage) -> Optional[ActorMessage]:
         """Обработчик получения контекста (заглушка для этапа 3.2.1)"""
@@ -182,7 +179,7 @@ class MemoryActor(BaseActor):
             )
         
         # TODO: Реализация в этапе 3.2.2
-        self.logger.debug(f"GET_CONTEXT handler called (stub)")
+        self.logger.debug("GET_CONTEXT handler called (stub)")
         
         # Возвращаем заглушку
         return ActorMessage.create(
@@ -204,7 +201,7 @@ class MemoryActor(BaseActor):
             return
         
         # TODO: Реализация в этапе 3.2.2
-        self.logger.debug(f"CLEAR_USER_MEMORY handler called (stub)")
+        self.logger.debug("CLEAR_USER_MEMORY handler called (stub)")
     
     def _increment_metric(self, metric_name: str, value: int = 1) -> None:
         """Инкремент метрики"""
