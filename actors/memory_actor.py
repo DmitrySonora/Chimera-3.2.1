@@ -49,6 +49,10 @@ class MemoryActor(BaseActor):
     async def initialize(self) -> None:
         """Инициализация актора и проверка схемы БД"""
         try:
+            # Проверяем, нужно ли подключаться
+            if not db_connection._is_connected:
+                await db_connection.connect()
+            
             # Получаем пул подключений
             self._pool = db_connection.get_pool()
             
