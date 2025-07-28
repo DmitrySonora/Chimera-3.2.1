@@ -6,7 +6,6 @@ from typing import Dict, List
 from datetime import datetime
 from config.logging import get_logger
 from config.settings import (
-    EVENT_STORE_MIGRATION_BATCH,
     EVENT_STORE_MIGRATION_DELAY,
     EVENT_STORE_MIGRATION_VERIFY
 )
