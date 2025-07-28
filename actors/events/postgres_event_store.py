@@ -94,8 +94,8 @@ class PostgresEventStore:
         # Записываем оставшиеся события
         await self._flush_buffer()
         
-        # Отключаемся от БД
-        await db_connection.disconnect()
+        # НЕ отключаемся от БД - это ответственность внешнего кода
+        # await db_connection.disconnect()
         
         self._is_initialized = False
         self.logger.info("PostgresEventStore closed")
