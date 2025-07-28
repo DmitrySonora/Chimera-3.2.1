@@ -1,33 +1,21 @@
 import asyncio
 import pytest
 import pytest_asyncio
-import os
 from datetime import datetime, timedelta
 from actors.events import BaseEvent, PostgresEventStore
-from database.connection import db_connection
-
-# Пропускаем тесты если нет подключения к PostgreSQL
-pytestmark = pytest.mark.skipif(
-    not os.getenv("POSTGRES_DSN"),
-    reason="PostgreSQL tests require POSTGRES_DSN environment variable"
-)
 
 
 @pytest_asyncio.fixture
-async def postgres_store():
-    """Фикстура для создания и очистки PostgreSQL Event Store"""
+async def postgres_store(clean_test_data):
+    """Фикстура для создания PostgreSQL Event Store"""
     # Создаем store
     store = PostgresEventStore()
     await store.initialize()
     
-    # Очищаем тестовые данные перед тестом
-    await db_connection.execute("DELETE FROM events WHERE stream_id LIKE 'test_%'")
-    
     # Возвращаем store для использования в тестах
     yield store
     
-    # Очищаем после теста
-    await db_connection.execute("DELETE FROM events WHERE stream_id LIKE 'test_%'")
+    # Закрываем store (но не подключение к БД)
     await store.close()
 
 

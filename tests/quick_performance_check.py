@@ -153,6 +153,7 @@ async def quick_performance_check():
         # Очистка
         await db_connection.execute("DELETE FROM events WHERE stream_id LIKE 'perf_check_%'")
         await store.close()
+        # НЕ закрываем db_connection
 
 
 if __name__ == "__main__":
